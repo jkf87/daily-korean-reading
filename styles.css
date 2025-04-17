@@ -154,13 +154,13 @@ h1 {
 }
 
 .answer-space {
-    height: 20px;
+    height: 40px;
     border-bottom: 1px solid #ddd;
     margin-top: 4px;
 }
 
 .answer-space.large {
-    height: 50px;
+    height: 100px;
 }
 
 /* 인쇄 스타일 최적화 */

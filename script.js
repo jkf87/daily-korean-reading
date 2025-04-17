@@ -3,31 +3,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const passageText = document.getElementById('passage-text');
     const questionsContainer = document.getElementById('questions');
     
-    // API 키 설정
-    let GEMINI_API_KEY = localStorage.getItem('gemini_api_key') || '';
+    // API 키 설정 - config.js에서 불러옵니다
+    let GEMINI_API_KEY = CONFIG.GEMINI_API_KEY;
     
     // 날짜 입력란에 오늘 날짜를 자동으로 입력합니다
     document.getElementById('date').value = new Date().toLocaleDateString('ko-KR');
     
-    // API 키 설정 UI 추가
-    const apiKeyContainer = document.createElement('div');
-    apiKeyContainer.className = 'api-key-container';
-    apiKeyContainer.innerHTML = `
-        <div class="info-item">
-            <label for="api-key">Gemini API Key:</label>
-            <input type="password" id="api-key" value="${GEMINI_API_KEY}">
-            <button id="save-api-key">저장</button>
-        </div>
-    `;
-    document.querySelector('.button-container').appendChild(apiKeyContainer);
-    
-    // API 키 저장 버튼 이벤트
-    document.getElementById('save-api-key').addEventListener('click', function() {
-        const apiKey = document.getElementById('api-key').value;
-        GEMINI_API_KEY = apiKey;
-        localStorage.setItem('gemini_api_key', apiKey);
-        alert('API 키가 저장되었습니다.');
-    });
+    // API 키 설정 UI는 개발 모드에서만 표시
+    if (GEMINI_API_KEY === 'YOUR-API-KEY-HERE') {
+        const apiKeyContainer = document.createElement('div');
+        apiKeyContainer.className = 'api-key-container';
+        apiKeyContainer.innerHTML = `
+            <div class="info-item">
+                <label for="api-key">Gemini API Key:</label>
+                <input type="password" id="api-key" value="${GEMINI_API_KEY}">
+                <button id="save-api-key">저장</button>
+            </div>
+        `;
+        document.querySelector('.button-container').appendChild(apiKeyContainer);
+        
+        // API 키 저장 버튼 이벤트
+        document.getElementById('save-api-key').addEventListener('click', function() {
+            const apiKey = document.getElementById('api-key').value;
+            GEMINI_API_KEY = apiKey;
+            alert('API 키가 저장되었습니다. config.js 파일에 복사해서 영구적으로 저장하세요.');
+        });
+    }
 
     // Gemini API를 사용하여 지문과 문제를 생성하는 함수
     async function generatePassageWithGemini() {
@@ -51,10 +52,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             2. 지문은 3~4개의 문단으로 구성되어야 합니다.
                             3. 각 문단은 명확한 중심문장을 포함해야 합니다.
                             4. 지문의 전체 길이는 800자 내외여야 합니다.
-                            5. 다음 형식으로 출력해주세요:
+                            5. 마크다운이나 특수 문자를 사용하지 말고, 순수 텍스트로만 작성해주세요.
+                            6. 각 문단은 일반적인 들여쓰기만 사용하고, 특별한 구분자나 기호를 사용하지 마세요.
+                            7. 다음 JSON 형식으로만 출력해주세요:
                             {
-                                "title": "제목",
-                                "content": "지문 내용",
+                                "title": "제목 (특수문자 없이)",
+                                "content": "지문 내용 (각 문단은 일반 줄바꿈으로만 구분)",
                                 "questions": [
                                     {
                                         "type": "사실확인",
@@ -65,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             "세 번째 선택지",
                                             "네 번째 선택지"
                                         ],
-                                        "wrongOptionIndex": 0  // 0~3 중 랜덤하게 틀린 답을 지정
+                                        "wrongOptionIndex": 0
                                     },
                                     {
                                         "type": "중심문장",
