@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const passageText = document.getElementById('passage-text');
     const questionsContainer = document.getElementById('questions');
     const newPassageButton = document.getElementById('new-passage');
+    const topicInput = document.getElementById('topic-input');
     const spinner = newPassageButton.querySelector('.spinner');
     
     // API 키 설정
@@ -39,10 +40,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // 로딩 상태 시작
+        newPassageButton.classList.add('loading');
         newPassageButton.disabled = true;
-        spinner.style.display = 'inline-block';
 
         try {
+            const topic = topicInput.value.trim();
+            const topicPrompt = topic ? `주제: ${topic}\n` : '';
+
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: {
@@ -52,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     contents: [{
                         role: "user",
                         parts: [{
-                            text: `다음 요구사항에 맞는 비문학 지문과 문제를 생성해주세요:
+                            text: `${topicPrompt}다음 요구사항에 맞는 비문학 지문과 문제를 생성해주세요:
                             1. 초등학생 수준의 교과서에 나올 수 있는 비문학 지문을 작성해주세요.
                             2. 지문은 4개의 문단으로 구성되어야 합니다.
                             3. 각 문단은 명확한 중심문장을 포함해야 합니다.
@@ -135,8 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('지문 생성 중 오류가 발생했습니다: ' + error.message);
         } finally {
             // 로딩 상태 종료
+            newPassageButton.classList.remove('loading');
             newPassageButton.disabled = false;
-            spinner.style.display = 'none';
         }
     }
     
@@ -234,8 +238,15 @@ document.addEventListener('DOMContentLoaded', function() {
             answersHTML;
     }
     
+    // 엔터 키로도 지문 생성 가능하도록 설정
+    topicInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !newPassageButton.disabled) {
+            generatePassageWithGemini();
+        }
+    });
+    
     // 새로운 지문 생성 버튼 이벤트 리스너
-    document.getElementById('new-passage').addEventListener('click', generatePassageWithGemini);
+    newPassageButton.addEventListener('click', generatePassageWithGemini);
     
     // 인쇄 버튼 이벤트 리스너
     document.getElementById('print-sheet').addEventListener('click', function() {

@@ -612,4 +612,73 @@ footer a:hover {
     .spinner {
         display: none !important;
     }
+}
+
+/* 주제 입력 필드 스타일 */
+.topic-container {
+    margin: 20px auto;
+    max-width: 600px;
+    padding: 0 15px;
+}
+
+#topic-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+#topic-input:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+#topic-input::placeholder {
+    color: #999;
+}
+
+/* 스피너 스타일 수정 */
+.spinner-border {
+    display: none;
+    width: 1.2em;
+    height: 1.2em;
+    margin-left: 8px;
+    border: 2px solid;
+    border-color: #ffffff transparent #ffffff transparent;
+    border-radius: 50%;
+    animation: spinner-border .75s linear infinite;
+    vertical-align: middle;
+}
+
+@keyframes spinner-border {
+    to { transform: rotate(360deg); }
+}
+
+/* 버튼 내 텍스트와 스피너 정렬 */
+#new-passage {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 140px;
+}
+
+/* 로딩 중 스타일 */
+#new-passage.loading .spinner-border {
+    display: inline-block;
+}
+
+#new-passage.loading {
+    background-color: #45a049;
+    cursor: wait;
+}
+
+/* 인쇄 시 스타일 */
+@media print {
+    .topic-container,
+    .spinner-border {
+        display: none !important;
+    }
 } 
