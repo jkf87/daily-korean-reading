@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="초등학생을 위한 비문학 독해 학습지 생성기입니다. Gemini AI를 활용하여 다양한 주제의 지문과 문제를 자동으로 생성합니다.">
+    <title>AI 비문학 독해 학습지 생성기</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Open Graph 태그 추가 -->
+    <meta property="og:title" content="AI 비문학 독해 학습지 생성기">
+    <meta property="og:description" content="초등학생을 위한 비문학 독해 학습지 생성기입니다. Gemini AI를 활용하여 다양한 주제의 지문과 문제를 자동으로 생성합니다.">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <div class="container">
+        <h1>AI 비문학 독해 학습지 생성기</h1>
+        <div class="description">
+            <p>Gemini AI를 활용하여 초등학생 수준의 비문학 독해 학습지를 생성합니다.</p>
+            <p>사용하시려면 <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>에서 API 키를 발급받아 입력해주세요.</p>
+        </div>
+        <div class="button-container">
+            <button id="new-passage">새로운 지문</button>
+            <button id="print-sheet">인쇄하기</button>
+        </div>
+        
+        <!-- 학생 정보 양식 -->
+        <div class="student-info">
+            <div class="info-item">
+                <label for="class">반:</label>
+                <input type="text" id="class" name="class">
+            </div>
+            <div class="info-item">
+                <label for="number">번호:</label>
+                <input type="text" id="number" name="number">
+            </div>
+            <div class="info-item">
+                <label for="name">이름:</label>
+                <input type="text" id="name" name="name">
+            </div>
+            <div class="info-item">
+                <label for="date">날짜:</label>
+                <input type="text" id="date" name="date">
+            </div>
+        </div>
+        
+        <!-- 문제 페이지 -->
+        <div class="problem-page">
+            <div class="passage-container">
+                <h3>지문</h3>
+                <div id="passage-text" class="passage-text"></div>
+            </div>
+            
+            <div class="questions-container">
+                <h3>문제</h3>
+                <div id="questions" class="questions">
+                    <!-- 문제들이 여기에 동적으로 생성됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>© 2024 AI 비문학 독해 학습지 생성기 | <a href="https://github.com/jkf87/daily-korean-reading" target="_blank">GitHub</a></p>
+    </footer>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 

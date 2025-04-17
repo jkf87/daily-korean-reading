@@ -1,0 +1,5 @@
+const CONFIG = {
+    // Gemini API 키를 여기에 입력하세요
+    // https://console.cloud.google.com/apis/credentials 에서 발급 가능
+    GEMINI_API_KEY: 'YOUR-API-KEY-HERE'
+}; 
