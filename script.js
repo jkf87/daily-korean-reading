@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // DOM 요소들을 가져옵니다
     const passageText = document.getElementById('passage-text');
     const questionsContainer = document.getElementById('questions');
+    const newPassageButton = document.getElementById('new-passage');
+    const spinner = newPassageButton.querySelector('.spinner');
     
     // API 키 설정
     let GEMINI_API_KEY = localStorage.getItem('gemini_api_key') || '';
@@ -35,6 +37,10 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Gemini API 키를 먼저 설정해주세요.');
             return;
         }
+
+        // 로딩 상태 시작
+        newPassageButton.disabled = true;
+        spinner.style.display = 'inline-block';
 
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${GEMINI_API_KEY}`, {
@@ -127,6 +133,10 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error:', error);
             alert('지문 생성 중 오류가 발생했습니다: ' + error.message);
+        } finally {
+            // 로딩 상태 종료
+            newPassageButton.disabled = false;
+            spinner.style.display = 'none';
         }
     }
     
