@@ -58,13 +58,24 @@ document.addEventListener('DOMContentLoaded', function() {
                         parts: [{
                             text: `${topicPrompt}다음 요구사항에 맞는 비문학 지문과 문제를 생성해주세요:
                             1. 초등학생 수준의 교과서에 나올 수 있는 비문학 지문을 작성해주세요.
-                            2. 지문은 4개의 문단으로 구성되어야 합니다.
-                            3. 각 문단은 명확한 중심문장을 포함해야 합니다.
+                            2. 지문은 3~5개의 문단으로 구성되어야 합니다.
+                            3. 각 문단은 명확한 중심문장과 뒷받침 문장들로 구성해주세요.
                             4. 지문의 전체 길이는 1200자 내외여야 합니다.
                             5. 다음 형식으로 출력해주세요:
                             {
                                 "title": "제목",
                                 "content": "지문 내용",
+                                "paragraphs": [
+                                    {
+                                        "mainSentence": "첫 번째 문단의 중심문장",
+                                        "content": "첫 번째 문단 전체 내용"
+                                    },
+                                    {
+                                        "mainSentence": "두 번째 문단의 중심문장",
+                                        "content": "두 번째 문단 전체 내용"
+                                    }
+                                    // 문단 수에 따라 추가
+                                ],
                                 "questions": [
                                     {
                                         "type": "사실확인",
@@ -75,31 +86,20 @@ document.addEventListener('DOMContentLoaded', function() {
                                             "세 번째 선택지",
                                             "네 번째 선택지"
                                         ],
-                                        "wrongOptionIndex": 0,  // 0~3 중 랜덤하게 틀린 답을 지정
+                                        "wrongOptionIndex": 0,
                                         "explanation": "이 선택지가 틀린 이유와 나머지 선택지들이 맞는 이유를 상세히 설명"
                                     },
                                     {
-                                        "type": "중심문장",
-                                        "paragraph": 1,
-                                        "question": "2. 첫 번째 문단의 중심문장을 찾아 쓰시오.",
-                                        "explanation": "이 문장이 중심문장인 이유와 이 문장을 중심으로 문단이 어떻게 전개되는지 설명"
-                                    },
-                                    {
-                                        "type": "중심문장",
-                                        "paragraph": 2,
-                                        "question": "3. 두 번째 문단의 중심문장을 찾아 쓰시오.",
-                                        "explanation": "이 문장이 중심문장인 이유와 이 문장을 중심으로 문단이 어떻게 전개되는지 설명"
-                                    },
-                                    {
-                                        "type": "중심문장",
-                                        "paragraph": 3,
-                                        "question": "4. 세 번째 문단의 중심문장을 찾아 쓰시오.",
-                                        "explanation": "이 문장이 중심문장인 이유와 이 문장을 중심으로 문단이 어떻게 전개되는지 설명"
-                                    },
-                                    {
-                                        "type": "요약",
-                                        "question": "5. 이 글을 요약해서 세 문장으로 쓰시오.",
-                                        "explanation": "각 문단의 핵심 내용을 연결하여 전체 글의 흐름을 살리는 방법 설명"
+                                        "type": "글의이해",
+                                        "question": "2. 이 글의 중심 내용으로 가장 적절한 것은?",
+                                        "options": [
+                                            "첫 번째 선택지",
+                                            "두 번째 선택지",
+                                            "세 번째 선택지",
+                                            "네 번째 선택지"
+                                        ],
+                                        "correctOptionIndex": 0,
+                                        "explanation": "이 선택지가 정답인 이유와 다른 선택지들이 적절하지 않은 이유를 상세히 설명"
                                     }
                                 ]
                             }`
@@ -127,11 +127,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 generatedContent.questions[0].wrongOptionIndex = Math.floor(Math.random() * 4);
             }
 
-            // 마크다운 구분자 제거
+            // 마크다운 구분자 제거 후 문단별 중심문장 문제 추가
             generatedContent.content = generatedContent.content.replace(/\*\*/g, '');
             generatedContent.content = generatedContent.content.replace(/\*/g, '');
             generatedContent.content = generatedContent.content.replace(/\_\_/g, '');
             generatedContent.content = generatedContent.content.replace(/\_/g, '');
+
+            // 문단 수에 따라 중심문장 문제 추가
+            const paragraphs = generatedContent.content.split('\n').filter(p => p.trim());
+            for (let i = 0; i < paragraphs.length; i++) {
+                generatedContent.questions.push({
+                    "type": "중심문장",
+                    "paragraph": i + 1,
+                    "question": `${generatedContent.questions.length + 1}. ${i + 1}번째 문단의 중심 내용을 찾아 한 문장으로 쓰시오.`,
+                    "explanation": `이 문단의 중심 내용은 '${generatedContent.paragraphs[i].mainSentence}'입니다. 
+                    이는 문단의 핵심 주장을 담고 있으며, 나머지 문장들은 이를 구체적으로 설명하거나 뒷받침하는 예시와 근거를 제시합니다.`
+                });
+            }
+
+            // 요약하기 문제 추가
+            generatedContent.questions.push({
+                "type": "요약",
+                "question": `${generatedContent.questions.length + 1}. 이 글의 내용을 다음과 같이 요약해보세요.\n1) 글의 중심 내용을 한 문장으로\n2) 각 문단의 핵심 내용을 순서대로`,
+                "explanation": `요약 작성 방법:
+                1. 글의 중심 내용 파악하기
+                   - 제목과 각 문단의 중심문장을 연결하여 글 전체의 핵심 내용을 파악합니다.
+                   - 글쓴이가 가장 강조하고자 하는 내용이 무엇인지 생각해봅니다.
+                
+                2. 각 문단의 핵심 내용 정리하기
+                   - 각 문단의 중심문장과 뒷받침 문장들을 바탕으로 간략하게 정리합니다.
+                   - 문단의 순서를 고려하여 글의 전개 과정이 드러나도록 작성합니다.`
+            });
             
             displayPassage(generatedContent);
         } catch (error) {
@@ -148,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayPassage(passage) {
         // 지문 표시
         passageText.innerHTML = `<h4>${passage.title}</h4>
-            ${passage.content.split('\n').map(para => `<p>${para.trim()}</p>`).join('')}`;
+            ${passage.paragraphs.map(para => `<p>${para.content.trim()}</p>`).join('')}`;
         
         // 문제 표시
         let questionsHTML = '';
@@ -158,8 +184,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="answer-key">`;
         
         passage.questions.forEach((question, index) => {
-            if (question.type === "사실확인") {
-                const wrongIndex = question.wrongOptionIndex || 3; // 기본값은 3(④번)
+            if (question.type === "사실확인" || question.type === "글의이해") {
+                const isFactCheck = question.type === "사실확인";
+                const answerIndex = isFactCheck ? question.wrongOptionIndex : question.correctOptionIndex;
                 questionsHTML += `
                     <div class="question">
                         <h4>${question.question}</h4>
@@ -176,11 +203,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="answer-item">
                         <div class="answer-number">${index + 1}번</div>
                         <div class="answer-content">
-                            <div class="answer">정답: ${['①', '②', '③', '④'][wrongIndex]}</div>
+                            <div class="answer">정답: ${['①', '②', '③', '④'][answerIndex]}</div>
                             <div class="explanation">
                                 <p>해설:</p>
-                                <p>${question.explanation || `${wrongIndex + 1}번 선택지는 지문에서 언급되지 않거나 지문의 내용과 일치하지 않는 내용입니다. 
-                                나머지 선택지들은 모두 지문에서 직접적으로 언급된 내용입니다.`}</p>
+                                <p>${question.explanation}</p>
                             </div>
                         </div>
                     </div>`;
@@ -191,19 +217,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="answer-space"></div>
                     </div>`;
                 
-                // 중심문장 문제의 정답은 해당 문단의 중심문장
-                const paragraphs = passage.content.split('\n').filter(p => p.trim()); // 빈 줄 제거
-                const mainSentence = paragraphs[question.paragraph - 1].split('.')[0] + '.';
                 answersHTML += `
                     <div class="answer-item">
                         <div class="answer-number">${index + 1}번</div>
                         <div class="answer-content">
-                            <div class="answer">정답: ${mainSentence}</div>
+                            <div class="answer">정답 예시: ${passage.paragraphs[question.paragraph - 1].mainSentence}</div>
                             <div class="explanation">
                                 <p>해설:</p>
-                                <p>${question.explanation || `${question.paragraph}번째 문단의 첫 문장이 중심문장입니다. 
-                                이 문장은 문단의 주요 내용을 함축적으로 제시하고 있으며, 
-                                뒤따르는 문장들은 이 중심문장을 뒷받침하는 근거나 부연 설명을 제공합니다.`}</p>
+                                <p>${question.explanation}</p>
                             </div>
                         </div>
                     </div>`;
@@ -212,18 +233,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="question">
                         <h4>${question.question}</h4>
                         <div class="answer-space large"></div>
+                        <div class="answer-space large"></div>
                     </div>`;
+                
                 answersHTML += `
                     <div class="answer-item">
                         <div class="answer-number">${index + 1}번</div>
                         <div class="answer-content">
-                            <div class="answer">정답 작성 방법</div>
+                            <div class="answer">답안 작성 방법</div>
                             <div class="explanation">
                                 <p>해설:</p>
-                                <p>${question.explanation || `1. 각 문단의 중심문장을 찾아 핵심 내용을 파악합니다.
-                                2. 중심문장들을 자연스럽게 연결하여 전체 글의 흐름을 살립니다.
-                                3. 불필요한 세부사항은 제외하고 핵심 내용만 간추려 작성합니다.
-                                4. 글의 처음, 중간, 끝의 흐름이 논리적으로 연결되도록 작성합니다.`}</p>
+                                <p>${question.explanation}</p>
                             </div>
                         </div>
                     </div>`;
