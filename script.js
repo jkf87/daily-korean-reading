@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -93,10 +93,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         }]
                     }],
                     generationConfig: {
-                        temperature: 0.7,
-                        topK: 40,
-                        topP: 0.95,
-                        maxOutputTokens: 2048
+                        temperature: 0.2,
+                        topK: 32,
+                        topP: 0.8,
+                        maxOutputTokens: 4096
                     }
                 })
             });
@@ -109,14 +109,38 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log('API 응답:', data); // 디버깅용
 
+            // candidates 배열이 존재하는지 확인
+            if (!data.candidates || !data.candidates.length || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts.length) {
+                console.error('API 응답 구조 오류:', data);
+                throw new Error('API 응답 형식이 올바르지 않습니다. 다시 시도해주세요.');
+            }
+
             const generatedText = data.candidates[0].content.parts[0].text;
+            
             // JSON 형식 문자열 찾기
             const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
             if (!jsonMatch) {
-                throw new Error('생성된 응답에서 JSON 형식을 찾을 수 없습니다.');
+                console.error('JSON 형식 찾기 실패:', generatedText);
+                throw new Error('생성된 응답에서 JSON 형식을 찾을 수 없습니다. 다시 시도해주세요.');
             }
 
-            const generatedContent = JSON.parse(jsonMatch[0]);
+            let generatedContent;
+            try {
+                generatedContent = JSON.parse(jsonMatch[0]);
+                
+                // 필수 필드 확인
+                if (!generatedContent.title || !generatedContent.content || !generatedContent.questions) {
+                    throw new Error('JSON 응답에 필수 필드가 없습니다.');
+                }
+                
+                // questions 배열 확인
+                if (!Array.isArray(generatedContent.questions) || generatedContent.questions.length === 0) {
+                    throw new Error('questions 배열이 올바르지 않습니다.');
+                }
+            } catch (jsonError) {
+                console.error('JSON 파싱 오류:', jsonError, jsonMatch[0]);
+                throw new Error('응답 데이터 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+            }
             
             // wrongOptionIndex가 없으면 랜덤하게 생성
             if (!generatedContent.questions[0].wrongOptionIndex) {
