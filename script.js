@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         passage.questions.forEach((question, index) => {
             if (question.type === "사실확인") {
-                const wrongIndex = question.wrongOptionIndex || 3; // 기본값은 3(④번)
+                const wrongIndex = question.wrongOptionIndex || 0;
                 questionsHTML += `
                     <div class="question">
                         <h4>${question.question}</h4>
@@ -158,14 +158,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         `).join('')}
                     </div>`;
                 
+                // 해설 생성 개선
+                const wrongOption = question.options[wrongIndex];
+                const wrongSymbol = ['①', '②', '③', '④'][wrongIndex];
+                
                 answersHTML += `
                     <div class="answer-item">
                         <div class="answer-number">1.</div>
                         <div class="answer-content">
-                            <div class="answer">정답: ${['①', '②', '③', '④'][wrongIndex]}</div>
+                            <div class="answer">정답: ${wrongSymbol}</div>
                             <div class="explanation">
-                                해설: ${wrongIndex + 1}번 선택지는 지문에서 언급되지 않거나 지문의 내용과 일치하지 않는 내용입니다. 
-                                나머지 선택지들은 모두 지문에서 직접적으로 언급된 내용입니다.
+                                해설: 글의 내용과 일치하지 않는 것은 ${wrongSymbol} "${wrongOption}"입니다. 
+                                ${wrongIndex === 0 ? '첫 번째 문단에서 "우리 주변에는 눈에 보이지 않는 작은 세균들이 많이 살고 있어요"라고 했으므로, 세균은 눈으로 직접 볼 수 없습니다.' : ''}
+                                ${wrongIndex === 1 ? '두 번째 문단에서 "손을 깨끗이 씻는 것은 세균을 없애는 가장 좋은 방법이에요"라고 했으므로, 이 선택지는 글의 내용과 일치하지 않습니다.' : ''}
+                                ${wrongIndex === 2 ? '두 번째 문단에서 "특히 바깥에서 놀고 온 뒤, 화장실에 다녀온 뒤, 밥을 먹기 전에는 꼭 손을 씻어야 합니다"라고 했으므로, 이 선택지는 글의 내용과 일치하지 않습니다.' : ''}
+                                ${wrongIndex === 3 ? '두 번째 문단에서 "물로만 씻는 것보다 비누를 사용하면 훨씬 더 많은 세균을 없앨 수 있어요"라고 했으므로, 이 선택지는 글의 내용과 일치하지 않습니다.' : ''}
                             </div>
                         </div>
                     </div>`;
@@ -178,7 +185,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // 중심문장 문제의 정답은 해당 문단의 중심문장
                 const paragraphs = passage.content.split('\n').filter(p => p.trim()); // 빈 줄 제거
-                const mainSentence = paragraphs[question.paragraph - 1].split('.')[0] + '.';
+                let mainSentence = '';
+                
+                // 첫 번째 문장을 중심문장으로 취급
+                if (paragraphs.length >= question.paragraph) {
+                    const sentences = paragraphs[question.paragraph - 1].split('.');
+                    if (sentences.length > 0) {
+                        mainSentence = sentences[0] + '.';
+                    }
+                }
+                
                 answersHTML += `
                     <div class="answer-item">
                         <div class="answer-number">${index + 1}.</div>
@@ -186,8 +202,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="answer">정답: ${mainSentence}</div>
                             <div class="explanation">
                                 해설: ${question.paragraph}번째 문단의 첫 문장이 중심문장입니다. 
-                                이 문장은 문단의 주요 내용을 함축적으로 제시하고 있으며, 
-                                뒤따르는 문장들은 이 중심문장을 뒷받침하는 근거나 부연 설명을 제공합니다.
+                                이 문장은 해당 문단에서 전달하고자 하는 핵심 내용을 담고 있으며, 
+                                이어지는 문장들은 이 중심문장을 부연 설명하거나 구체적인 예시를 제공합니다.
                             </div>
                         </div>
                     </div>`;
@@ -197,15 +213,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         <h4>${question.question}</h4>
                         <div class="answer-space large"></div>
                     </div>`;
+                
+                // 요약문제 해설 개선
+                const paragraphs = passage.content.split('\n').filter(p => p.trim());
+                const mainIdeas = paragraphs.map(p => p.split('.')[0] + '.').join(' ');
+                
                 answersHTML += `
                     <div class="answer-item">
                         <div class="answer-number">${index + 1}.</div>
                         <div class="answer-content">
-                            <div class="answer">정답 작성 방법</div>
+                            <div class="answer">정답 예시</div>
                             <div class="explanation">
-                                해설: 
+                                해설: 각 문단의 중심문장을 토대로 요약하면 다음과 같습니다:
+                                "${mainIdeas}"
+                                
+                                요약문 작성 방법:
                                 1. 각 문단의 중심문장을 찾아 핵심 내용을 파악합니다.
-                                2. 중심문장들을 자연스럽게 연결하여 전체 글의 흐름을 살립니다.
+                                2. 찾아낸 중심문장들을 자연스럽게 연결하여 전체 글의 흐름을 살립니다.
                                 3. 불필요한 세부사항은 제외하고 핵심 내용만 간추려 작성합니다.
                                 4. 글의 처음, 중간, 끝의 흐름이 논리적으로 연결되도록 작성합니다.
                             </div>
