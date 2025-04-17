@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -92,14 +92,23 @@ document.addEventListener('DOMContentLoaded', function() {
                                 ]
                             }`
                         }]
-                    }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 2048
+                    }
                 })
             });
 
             const data = await response.json();
+            
             if (data.error) {
                 throw new Error(data.error.message);
             }
+            
+            console.log('API 응답:', data); // 디버깅용
 
             const generatedText = data.candidates[0].content.parts[0].text;
             // JSON 형식 문자열 찾기
