@@ -3,7 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # 또는 master
+      - main
+
+permissions:
+  contents: write
 
 jobs:
   build-and-deploy:
@@ -16,8 +19,8 @@ jobs:
         run: |
           echo "const CONFIG = { GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}' };" > config.js
 
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          branch: gh-pages
-          folder: . 
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: . 
