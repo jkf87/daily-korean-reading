@@ -3,32 +3,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const passageText = document.getElementById('passage-text');
     const questionsContainer = document.getElementById('questions');
     
-    // API 키 설정 - config.js에서 불러옵니다
-    let GEMINI_API_KEY = CONFIG.GEMINI_API_KEY;
+    // API 키 설정 - 로컬 스토리지에서 불러옵니다
+    let GEMINI_API_KEY = localStorage.getItem('gemini_api_key') || '';
     
     // 날짜 입력란에 오늘 날짜를 자동으로 입력합니다
     document.getElementById('date').value = new Date().toLocaleDateString('ko-KR');
     
-    // API 키 설정 UI는 개발 모드에서만 표시
-    if (GEMINI_API_KEY === 'YOUR-API-KEY-HERE') {
-        const apiKeyContainer = document.createElement('div');
-        apiKeyContainer.className = 'api-key-container';
-        apiKeyContainer.innerHTML = `
-            <div class="info-item">
-                <label for="api-key">Gemini API Key:</label>
-                <input type="password" id="api-key" value="${GEMINI_API_KEY}">
-                <button id="save-api-key">저장</button>
-            </div>
-        `;
-        document.querySelector('.button-container').appendChild(apiKeyContainer);
-        
-        // API 키 저장 버튼 이벤트
-        document.getElementById('save-api-key').addEventListener('click', function() {
-            const apiKey = document.getElementById('api-key').value;
-            GEMINI_API_KEY = apiKey;
-            alert('API 키가 저장되었습니다. config.js 파일에 복사해서 영구적으로 저장하세요.');
-        });
-    }
+    // API 키 설정 UI 추가
+    const apiKeyContainer = document.createElement('div');
+    apiKeyContainer.className = 'api-key-container';
+    apiKeyContainer.innerHTML = `
+        <div class="info-item">
+            <label for="api-key">Gemini API Key:</label>
+            <input type="password" id="api-key" value="${GEMINI_API_KEY}">
+            <button id="save-api-key">저장</button>
+        </div>
+    `;
+    document.querySelector('.button-container').appendChild(apiKeyContainer);
+    
+    // API 키 저장 버튼 이벤트
+    document.getElementById('save-api-key').addEventListener('click', function() {
+        const apiKey = document.getElementById('api-key').value;
+        GEMINI_API_KEY = apiKey;
+        localStorage.setItem('gemini_api_key', apiKey);
+        alert('API 키가 저장되었습니다.');
+    });
 
     // Gemini API를 사용하여 지문과 문제를 생성하는 함수
     async function generatePassageWithGemini() {
