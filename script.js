@@ -116,6 +116,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!generatedContent.questions[0].wrongOptionIndex) {
                 generatedContent.questions[0].wrongOptionIndex = Math.floor(Math.random() * 4);
             }
+
+            // 마크다운 구분자 제거
+            generatedContent.content = generatedContent.content.replace(/\*\*/g, '');
+            generatedContent.content = generatedContent.content.replace(/\*/g, '');
+            generatedContent.content = generatedContent.content.replace(/\_\_/g, '');
+            generatedContent.content = generatedContent.content.replace(/\_/g, '');
             
             displayPassage(generatedContent);
         } catch (error) {
@@ -154,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 answersHTML += `
                     <div class="answer-item">
-                        <div class="answer-number">1.</div>
+                        <div class="answer-number">${index + 1}번</div>
                         <div class="answer-content">
                             <div class="answer">정답: ${['①', '②', '③', '④'][wrongIndex]}</div>
                             <div class="explanation">
@@ -176,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const mainSentence = paragraphs[question.paragraph - 1].split('.')[0] + '.';
                 answersHTML += `
                     <div class="answer-item">
-                        <div class="answer-number">${index + 1}.</div>
+                        <div class="answer-number">${index + 1}번</div>
                         <div class="answer-content">
                             <div class="answer">정답: ${mainSentence}</div>
                             <div class="explanation">
@@ -195,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>`;
                 answersHTML += `
                     <div class="answer-item">
-                        <div class="answer-number">${index + 1}.</div>
+                        <div class="answer-number">${index + 1}번</div>
                         <div class="answer-content">
                             <div class="answer">정답 작성 방법</div>
                             <div class="explanation">
