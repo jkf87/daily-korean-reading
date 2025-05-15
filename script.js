@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const topic = topicInput.value.trim();
             const topicPrompt = topic ? `주제: ${topic}\n` : '';
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
